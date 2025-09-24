@@ -1,63 +1,37 @@
 <template>
   <div class="person">
-    <h2>姓名：{{name}}</h2>
-    <h2>年龄：{{age}}</h2>
+    <h2>姓名：{{person.name}}</h2>
+    <h2>年龄：{{person.age}}，{{nl}}</h2>
     <button @click="changeName">修改名字</button>
     <button @click="changeAge">修改年龄</button>
-    <button @click="showTel">查看联系方式</button>
-    <hr>
-    <h2>测试1：{{a}}</h2>
-    <h2>测试2：{{c}}</h2>
-    <h2>测试3：{{d}}</h2>
-    <button @click="b">测试</button>
   </div>
 </template>
 
-<script lang="ts">
-  export default {
-    name:'Person',
-    beforeCreate(){
-      console.log('beforeCreate')
-    },
-    data(){
-      return {
-        a:100,
-        c:this.name,
-        d:900,
-        age:90
-      }
-    },
-    methods:{
-      b(){
-        console.log('b')
-      }
-    },
-    setup(){
-      // 数据，原来是写在data中的，此时的name、age、tel都不是响应式的数据
-      let name = '张三'
-      let age = 18
-      let tel = '13888888888'
-      
-      // 方法
-      function changeName() {
-        name = 'zhang-san' //注意：这样修改name，页面是没有变化的
-        console.log(name) //name确实改了，但name不是响应式的
-      }
-      function changeAge() {
-        age += 1 //注意：这样修改age，页面是没有变化的
-        console.log(age) //age确实改了，但age不是响应式的
-      }
-      function showTel() {
-        alert(tel)
-      }
+<script lang="ts" setup name="Person">
+  import {reactive,toRefs,toRef} from 'vue'
 
-      // 将数据、方法交出去，模板中才可以使用
-      return {name,age,tel,changeName,changeAge,showTel}
+  // 数据
+  let person = reactive({
+    name:'张三',
+    age:18
+  })
 
-      // setup的返回值也可以是一个渲染函数
-      // return ()=>'哈哈'
-    }
+  // 使用toRefs从person这个响应式对象中，解构出name、age，且name和age依然是响应式的
+  // name和age的值是ref类型，其value值指向的是person.name和person.age
+  let {name,age} = toRefs(person)
+  let nl = toRef(person,'age')
+  
+  console.log(nl.value)
+
+  // 方法
+  function changeName(){
+    name.value += '~'
+    console.log(name.value,person.name)
   }
+  function changeAge(){
+    age.value += 1
+  }
+
 </script>
 
 <style scoped>
@@ -69,5 +43,8 @@
   }
   button {
     margin: 0 5px;
+  }
+  li {
+    font-size: 20px;
   }
 </style>
